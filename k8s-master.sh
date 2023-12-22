@@ -31,11 +31,11 @@ apt-get update
 echo  '\033[1mInstalling Kubeadm, Kubelet and Kubectl\033[0m'
 apt-get update
 
-apt-get install -y apt-transport-https ca-certificates curl
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
-sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.27/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+scurl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.27/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 apt-get update
 
@@ -58,7 +58,7 @@ echo  '\033[7mInitializing the cluster\033[0m'
 
 sleep 3
 
-sudo kubeadm init  
+sudo kubeadm init --pod-network-cidr 10.244.0.0/16
 sleep 5
 
 echo  '\033[7mRunning the steps explained at the end of script for you\033[0m'
@@ -67,9 +67,9 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-echo  '\033[7mInstalling Calico Network Plugin\033[0m'
+echo  '\033[7mInstalling flannel Network Plugin\033[0m'
 
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 echo
 echo
 echo  '\033[5mWait for 40 seconds\033[0m'
