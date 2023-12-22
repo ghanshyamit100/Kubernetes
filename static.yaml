@@ -1,0 +1,12 @@
+#go to the location /etc/netplan and create a file with name static.yaml and save it
+#run netplan apply 
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:  # Replace with your actual interface name
+      addresses: [192.168.1.100/24]  # Set your static IP and subnet mask
+      gateway4: 192.168.1.1  # Set your gateway address
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]  # Set your DNS servers
