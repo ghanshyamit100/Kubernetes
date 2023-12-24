@@ -1,57 +1,142 @@
-#!/bin/bash
-#this will create kubernetes cluster
-#and install all packages required on
-#all the nodes.
+# Kubeadm Installation Guide
 
-#run this on all machines
+This guide outlines the steps needed to set up a Kubernetes cluster using kubeadm.
 
-echo "### Enabling Bridging"
-sleep 2
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-br_netfilter
-EOF
+## Pre-requisites
 
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
+* Ubuntu OS (Xenial or later)
+* sudo privileges
+* Internet access
 
-sudo sysctl --system
+---
 
-clear
-echo "### Adding repositories"
-echo "### Installing kubelet, kubeadm, kubectl & docker"
-sleep 2
+## Both Master & Worker Node
 
-sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
-sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl docker.io
-sudo apt-mark hold kubelet kubeadm kubectl
-sudo systemctl start docker; systemctl enable docker
+Run the following commands on both the master and worker nodes to prepare them for kubeadm.
 
-echo ""
-echo "### Packages installed successfully"
-echo "Clearing screen"
-sleep 2
-echo ""
-echo "### On Master, run"
-echo "kubeadm init --apiserver-advertise-address 10.0.0.100 --ignore-preflight-errors all"
-echo ""
-echo ""
-echo "mkdir -p $HOME/.kube"
-echo "sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config"
-echo "sudo chown $(id -u):$(id -g) $HOME/.kube/config"
-echo ""
-echo "install overlay network"
-echo "curl https://docs.projectcalico.org/manifests/calico.yaml -O"
-echo "kubectl apply -f calico.yaml"
-echo ""
-echo "get worker join token"
-echo "kubeadm token create --print-join-command"
-echo ""
-echo "copy the output of previous command and paste on all nodes"
-echo "## we are done"
+```bash
+
+sudo apt update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo apt install docker.io -y
+
+sudo systemctl enable --now docker # enable and start in single command.
+
+# Adding GPG keys.
+curl -fsSL "https://packages.cloud.google.com/apt/doc/apt-key.gpg" | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes-archive-keyring.gpg
+
+# Add the repository to the sourcelist.
+echo 'deb https://packages.cloud.google.com/apt kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt update 
+sudo apt install kubeadm=1.20.0-00 kubectl=1.20.0-00 kubelet=1.20.0-00 -y
+```
+
+**Sample Command run on master node**
+
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/a4e7a4af-31fa-40cf-bb9e-64ba18999cb5)</kbd>
+
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/acf157b8-5c7b-44e7-91ef-b5437053be60)</kbd>
+
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/8f960aae-3706-43cd-bac8-1903fbe8196d)</kbd>
+
+---
+
+## Master Node
+
+1. Initialize the Kubernetes master node.
+
+    ```bash
+    sudo kubeadm init
+    ```
+    <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/4fed3d68-eb41-423d-b83f-35c3cc11476e)</kbd>
+
+    After succesfully running, your Kubernetes control plane will be initialized successfully.
+
+   <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/760276f4-9146-4bc1-aa92-48cc1c0b13f4)</kbd>
+
+
+3. Set up local kubeconfig (both for root user and normal user):
+
+    ```bash
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    ```
+
+    <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/f647adc1-0976-490e-b9c9-f6f96908d6fe)</kbd>
+
+
+4. Apply Weave network:
+
+    ```bash
+    kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+    ```
+
+    <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/ec7b4684-7719-4d09-81d8-eee27b98972a)</kbd>
+
+
+5. Generate a token for worker nodes to join:
+
+    ```bash
+    sudo kubeadm token create --print-join-command
+    ```
+
+    <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/0370839b-bbac-415c-9d5a-9ab52cd3108b)</kbd>
+
+6. Expose port 6443 in the Security group for the Worker to connect to Master Node
+
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/b3f5df01-acb0-419f-aa70-6d51819f4ec0)</kbd>
+
+
+---
+
+## Worker Node
+
+1. Run the following commands on the worker node.
+
+    ```bash
+    sudo kubeadm reset pre-flight checks
+    ```
+    <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/3d29912b-f1a3-4e0b-a6ee-6c9cc5db49fb)</kbd>
+
+2. Paste the join command you got from the master node and append `--v=5` at the end.
+*Make sure either you are working as sudo user or use `sudo` before the command*
+
+   <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/c41e3213-7474-43f9-9a7b-a75694be582a)</kbd>
+
+   After succesful join->
+   <kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/c530b65a-4afd-4b1d-9748-421c216d64cd)</kbd>
+
+---
+
+## Verify Cluster Connection
+
+On Master Node:
+
+```bash
+kubectl get nodes
+```
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/4ed4dcac-502a-4cc1-a63e-c9cbb0199428)</kbd>
+
+---
+
+## Optional: Labeling Nodes
+
+If you want to label worker nodes, you can use the following command:
+
+```bash
+kubectl label node <node-name> node-role.kubernetes.io/worker=worker
+```
+
+---
+
+## Optional: Test a demo Pod 
+
+If you want to test a demo pod, you can use the following command:
+
+```bash
+kubectl run hello-world-pod --image=busybox --restart=Never --command -- sh -c "echo 'Hello, World' && sleep 3600"
+```
+
+<kbd>![image](https://github.com/paragpallavsingh/kubernetes-kickstarter/assets/40052830/bace1884-bbba-4e2f-8fb2-83bbba819d08)</kbd>
