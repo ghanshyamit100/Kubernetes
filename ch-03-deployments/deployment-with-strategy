@@ -1,22 +1,22 @@
-apiVersion: apps/v1 
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-deploy
 spec:
-  replicas: 10
+  replicas: 5
   selector:
-     matchLabels:
-        app: hello-world
+    matchLabels:
+      app: hello-world
   minReadySeconds: 10
   strategy:
-     type: RollingUpdate
-     rollingUpdate:
-        maxUnavailable: 1
-        maxSurge: 1
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
-     annotations:
-        kubernetes.io/change-cause: "updated to new version"
+      annotations:
+        kubernetes.io/change-cause: "v1"
       labels:
         app: hello-world
     spec:
@@ -24,6 +24,4 @@ spec:
       - name: hello-pod
         image: ghanshyamit100/customwebserver:v1
         ports:
-        - containerPort: 80        
-
-# kubectl set image deploy/hello-deploy hello-pod=ghanshyamit100/webserver:v2 --annotation=update image from v1 to v2
+        - containerPort: 80
