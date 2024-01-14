@@ -7,6 +7,13 @@ This guide outlines the steps needed to set up a Kubernetes cluster using kubead
 * Ubuntu OS (Xenial or later)
 * sudo privileges
 * Internet access
+* Assign Static IP on VM (https://github.com/ghanshyamit100/Kubernetes/blob/main/static.yaml)
+* swap should be off
+     swapoff -a
+     comment the swap line -> vi /etc/fstab
+      <img width="610" alt="image" src="https://github.com/ghanshyamit100/Kubernetes/assets/130869263/6a8a205b-1fb9-4d92-82b2-33ab40e00095">
+
+  
 
 ---
 
