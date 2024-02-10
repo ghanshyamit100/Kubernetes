@@ -14,10 +14,11 @@ This will deploy the nginx-ingress controller as a Deployment in your cluster.
 Next, you will need to create some sample Deployments to route traffic to. Run the following commands to create the Deployments:
 
 ```
-kubectl create deploy sample-1 --image=devopsprosamples/next-path-sample-1
-kubectl create deploy sample-2 --image=devopsprosamples/next-path-sample-2
-kubectl create deploy sample-3 --image=devopsprosamples/next-sample-1
-kubectl create deploy sample-4 --image=devopsprosamples/next-sample-2
+kubectl apply -f deploy-sample-1.yaml
+kubectl apply -f deploy-sample-2.yaml
+kubectl apply -f deploy-sample-3.yaml
+kubectl apply -f deploy-sample-4.yaml
+
 ```
 
 These commands will create four sample Deployments with different images.
@@ -26,10 +27,10 @@ These commands will create four sample Deployments with different images.
 After you have created the Deployments, you will need to create Services for each of them. Run the following commands to create the Services:
 
 ```
-kubectl expose deploy sample-1 --type=ClusterIP --port=3000
-kubectl expose deploy sample-2 --type=ClusterIP --port=3000
-kubectl expose deploy sample-3 --type=ClusterIP --port=3000
-kubectl expose deploy sample-4 --type=ClusterIP --port=3000
+kubectl expose deploy sample-1 --name sample1-svc --type=ClusterIP --port=3000
+kubectl expose deploy sample-2 --name sample2-svc --type=ClusterIP --port=3000
+kubectl expose deploy sample-3 --name sample3-svc --type=ClusterIP --port=3000
+kubectl expose deploy sample-4 --name sample4-svc --type=ClusterIP --port=3000
 ```
 
 These commands will create four Services with ClusterIP type for each of the sample Deployments.
