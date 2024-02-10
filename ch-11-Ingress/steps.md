@@ -1,4 +1,4 @@
-ngress demonstration
+Ingress demonstration
 This is a demonstration of how to use Kubernetes Ingress to route traffic to different services in your cluster based on different paths.
 
 Install nginx-ingress controller :
@@ -14,7 +14,6 @@ kubectl apply -f deploy-sample-1.yaml
 kubectl apply -f deploy-sample-2.yaml
 kubectl apply -f deploy-sample-3.yaml
 kubectl apply -f deploy-sample-4.yaml
-
 These commands will create four sample Deployments with different images.
 
 Create services
@@ -31,3 +30,4 @@ Now that you have created the Services, you can create an Ingress resource to ro
 
 kubectl apply -f ingress-resource.yaml
 This will create an Ingress resource with rules to route traffic to the sample Services based on different paths.
+
