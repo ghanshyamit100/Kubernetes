@@ -5,7 +5,7 @@ This is a demonstration of how to use Kubernetes Ingress to route traffic to dif
 To get started, you will need to install the nginx-ingress controller in your Kubernetes cluster by running the following command:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/baremetal/deploy.yaml
 ```
 
 This will deploy the nginx-ingress controller as a Deployment in your cluster.
