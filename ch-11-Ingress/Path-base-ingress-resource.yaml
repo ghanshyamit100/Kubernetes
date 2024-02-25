@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-whoami
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.example.com
+    http:
+      paths:
+      - path: /whoami
+        pathType: Prefix
+        backend:
+          service:
+            name: whoami
+            port:
+              number: 8080
+  - host: www.example.com
+    http:
+      paths:
+      - path: /sample-2
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-3
+            port:
+              number: 3000
